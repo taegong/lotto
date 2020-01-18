@@ -26,8 +26,8 @@
 		<property name="username" value="root" />
 <!-- 		<property name="username" value="taegong" /> -->
 
-<!-- 		<property name="password" value="1234" /> -->
-		<property name="password" value="tjddlf12!@" />
+ 		<property name="password" value="1234" /> 
+
 		
 		
 
