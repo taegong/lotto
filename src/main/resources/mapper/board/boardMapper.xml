@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="BoardMapper">
+	
+	
+
+
+	<!-- 게시글 리스트 -->
+	<select id="tichuBoardList" resultType="LottoBoardBean">
+		SELECT
+		*
+		FROM
+		tb_count_board WHERE tb_board_bno > 0 and tb_board_del_type = 0 ORDER by tb_board_bno DESC
+
+		LIMIT
+		#{pageStart}, #{perPageNum}
+
+	</select>
+
+	<!-- 게시글 총페이지 -->
+	<select id="findTotalCount" resultType="int">
+		select count(*) from
+		tb_count_board
+	</select>
+
+	<!-- 글쓰기 -->
+	<select id="TichuboardInsert" parameterType="LottoBoardBean" resultType="int">
+		INSERT INTO
+		tb_count_board (tb_board_subject, TB_member_Name, TB_member_ID, tb_board_content ,tb_board_reg_date)
+		VALUES(#{tb_board_subject},#{TB_member_Name},#{TB_member_ID} ,#{tb_board_content},now())
+	</select>
+
+
+	<!-- 게시글 상세 -->
+	<select id="TichuboardDetail" parameterType="int"
+		resultType="LottoBoardBean">
+		SELECT
+		*
+		FROM tb_count_board
+		WHERE
+		tb_board_bno
+		=#{tb_board_bno}
+	</select>
+
+	<!-- 게시글 수정 -->
+	<update id="tichuBoardUpdate" parameterType="java.util.HashMap">
+		UPDATE tb_count_board
+		SET
+		<if test="tb_board_subject != null">
+			tb_board_subject = #{tb_board_subject}
+		</if>
+		<if test="tb_board_subject != null and tb_board_content != null"> ,
+		</if>
+		<if test="tb_board_content != null">
+			tb_board_content = #{tb_board_content}
+		</if>
+		WHERE tb_board_bno = #{tb_board_bno}
+	</update>
+
+
+	<!-- 게시글 삭제 -->
+	<update id="tichuBoardDelete"  parameterType="java.util.HashMap">
+		update 
+		tb_count_board set tb_board_dec = 1 , tb_board_del_type = 1 , tb_board_del_date = now() WHERE tb_board_bno =#{tb_board_bno}
+	</update>
+	
+	<select id="boardDeletereplyCount" resultType="int" parameterType="java.util.HashMap">
+	select count(*) from count_board_reply WHERE tb_board_bno = #{tb_board_bno}
+	</select>
+	
+	<delete id="boardDeleteReplyDel" parameterType="java.util.HashMap">
+	
+	
+		DELETE from count_board_reply WHERE tb_board_bno = #{tb_board_bno}
+	
+	</delete>
+	
+
+	<!-- 히트수 업 -->
+	<update id="BoardHit">
+		update tb_count_board set tb_board_hit
+		= tb_board_hit + 1
+
+		WHERE tb_board_bno = #{tb_board_bno}
+
+	</update>
+<!-- 댓글 쓰기 -->
+	<insert id="insertBoardReply" parameterType="java.util.HashMap">
+	<!-- 자동증가값을 가져 오기 위한 구문 -->
+		<selectKey resultType="string" keyProperty="parent_id"
+			order="BEFORE">
+			SELECT MAX(reply_id)+1 FROM count_board_reply
+		</selectKey>
+
+		insert into count_board_reply(
+		tb_board_bno,
+		depth,
+		reply_content,
+		TB_member_Name,
+		parent_id,
+		register_datetime
+		)values(
+		#{tb_board_bno},
+		#{depth},
+		#{reply_content},
+		#{TB_member_Name},
+		#{parent_id},
+		now()
+		)
+
+	</insert>
+<!-- 대댓글 쓰기 -->
+	<insert id="insertBoardReReply"
+		parameterType="java.util.HashMap">
+
+
+		insert into count_board_reply(
+		tb_board_bno,
+		depth,
+		reply_content,
+		TB_member_Name,
+		parent_id,
+		register_datetime
+		)values(
+		#{tb_board_bno},
+		#{depth},
+		#{reply_content},
+		#{TB_member_Name},
+		#{parent_id},
+		now()
+		)
+
+	</insert>
+<!-- 댓글 리스트 -->
+	<select id="replyBoardList" parameterType="int"
+		resultType="TichuBoardReplyBean">
+		SELECT * FROM count_board_reply WHERE tb_board_bno = #{tb_board_bno} and reply_del =0   ORDER
+		BY parent_id asc , reply_id ASC
+	</select>
+
+<!-- 댓글 삭제 -->
+
+	<update id="deleteBoardReply" parameterType="java.util.HashMap">
+
+
+		
+		update count_board_reply
+		set
+		reply_del = 1
+		, 
+		del_datetime = now()
+		where
+		reply_id = #{reply_id}
+		and TB_member_Name = #{TB_member_Name}
+		
+
+
+	</update>
+<!-- 대댓글 삭제 -->
+	<delete id="deleteBoardReplyDE"
+		parameterType="java.util.HashMap">
+
+
+		delete
+		from
+		count_board_reply
+		where
+		parent_id = #{reply_id}
+
+
+	</delete>
+	
+<!-- 	댓글수정을 위해 컨텐츠 가져오기 -->
+	<select id="replyUpdate" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	select * from count_board_reply where reply_id = #{reply_id}
+	
+	</select>
+<!-- 	댓글수정 -->
+	<update id="replyUpdatesPut" parameterType="java.util.HashMap">
+			UPDATE count_board_reply
+		SET
+		<if test="reply_content != null">
+			reply_content = #{reply_content}
+		</if>
+		WHERE reply_id = #{reply_id}
+	
+	</update>
+<!-- 	좋아요 -->
+		<insert id="boardUp" parameterType="java.util.HashMap">
+	
+	insert into board_up_down 
+	
+	(tb_board_bno, TB_member_ID , tb_board_up,tb_board_down, tb_board_type , tb_board_reg_date) 
+
+VALUES(${tb_board_bno}, ${TB_member_ID}, 1,0,${tb_board_type},now())
+	</insert>
+<!-- 	싫어요 -->
+			<insert id="boardDown" parameterType="java.util.HashMap">
+			insert into board_up_down 
+	
+	(tb_board_bno, TB_member_ID ,tb_board_up, tb_board_down, tb_board_type , tb_board_reg_date) 
+
+VALUES(${tb_board_bno}, ${TB_member_ID}, 0,1,${tb_board_type},now())
+	
+	</insert>
+<!-- 좋아요 갯수 -->
+<select id="boardUpCount" parameterType="LottoBoardBean" resultType="int">
+select count(tb_board_up)as tb_board_up from board_up_down WHERE tb_board_up =1 and tb_board_bno = ${tb_board_bno} and tb_board_type = 2
+</select>
+
+<!-- 싫어요 갯수 -->
+<select id="boardDownCount" parameterType="LottoBoardBean" resultType="int">
+select count(tb_board_down)as tb_board_down from board_up_down WHERE tb_board_down =1 and tb_board_bno = ${tb_board_bno} and tb_board_type = 2
+</select>
+
+<!-- 같은 아이디로 중복으로 체크 카운트 -->
+<select id="boardUPChk" parameterType="java.util.HashMap" resultType="int">   
+select count(*) from board_up_down WHERE tb_board_bno =${tb_board_bno} and TB_member_ID = ${TB_member_ID} and tb_board_type = 2
+</select> 
+
+
+</mapper>

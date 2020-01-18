@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="NoticeboardMapper">
+	<!-- 게시글 리스트 -->
+   <select id="NoticeBoardList" resultType="NoticeBoardBean">
+		SELECT
+		*
+		FROM
+		notice_freeboard WHERE tb_board_bno > 0 and tb_board_del_type = 0 ORDER by tb_board_bno DESC
+
+		LIMIT
+		#{pageStart}, #{perPageNum}
+
+	</select>
+	
+	  <!-- 게시글 총페이지 -->
+	<select id="findTotalCount" resultType="int">
+		select count(*) from
+		notice_freeboard
+	</select>
+	
+	<!-- 글쓰기 -->
+	<select id="noticeboardInsert" parameterType="java.util.HashMap" resultType="int">
+		INSERT INTO
+		notice_freeboard (tb_board_subject, TB_member_Name, TB_member_ID, tb_board_content ,tb_board_reg_date,tb_board_type)
+		VALUES(#{tb_board_subject},#{TB_member_Name},#{TB_member_ID} ,#{tb_board_content},now(),#{tb_board_type})
+	</select>
+	
+		<!-- 게시글 상세 -->
+	<select id="noticeboardDetail" parameterType="int"
+		resultType="NoticeBoardBean">
+		SELECT
+		*
+		FROM notice_freeboard
+		WHERE
+		tb_board_bno
+		=#{tb_board_bno}
+	</select>
+	
+	<!-- 게시글 수정 -->
+	<update id="noticeBoardUpdate" parameterType="java.util.HashMap">
+		UPDATE notice_freeboard
+		SET
+		<if test="tb_board_subject != null">
+			tb_board_subject = #{tb_board_subject}
+		</if>
+		<if test="tb_board_subject != null and tb_board_content != null"> ,
+		</if>
+		<if test="tb_board_content != null">
+			tb_board_content = #{tb_board_content}
+		</if>
+		WHERE tb_board_bno = #{tb_board_bno}
+	</update>
+	
+	
+	<!-- 게시글 삭제 -->
+	<update id="noticeBoardDelete"  parameterType="java.util.HashMap">
+		update 
+		notice_freeboard set tb_board_dec = 1 , tb_board_del_type = 1 , tb_board_del_date = now() WHERE tb_board_bno =#{tb_board_bno}
+	</update>
+	
+			<!-- 히트수 업 -->
+	<update id="BoardHit">
+		update notice_freeboard set tb_board_hit
+		= tb_board_hit + 1
+
+		WHERE tb_board_bno = #{tb_board_bno}
+
+	</update>
+	
+	<select id="NoticeboardUpCount" parameterType="NoticeBoardBean" resultType="int">
+select count(tb_board_up)as tb_board_up from board_up_down WHERE tb_board_up =1 and tb_board_bno = ${tb_board_bno} and tb_board_type = 1
+</select>
+
+<select id="NoticeboardDownCount" parameterType="FreeBoardBean" resultType="int">
+select count(tb_board_down)as tb_board_down from board_up_down WHERE tb_board_down =1 and tb_board_bno = ${tb_board_bno} and tb_board_type = 1
+</select>	
+
+<select id="NoticeboardUPChk" parameterType="java.util.HashMap" resultType="int">   
+select count(*) from board_up_down WHERE tb_board_bno =${tb_board_bno} and TB_member_ID = ${TB_member_ID} and tb_board_type = 1
+</select> 
+<!-- 인증게시판 공지사항 -->
+<select id="NoticeBoardListIn" resultType="NoticeBoardBean">
+select * from notice_freeboard WHERE tb_board_type = 1 and tb_board_dec =0 limit 5
+</select>
+<!-- 인증게시판 공지사항 -->
+<select id="FreeBoardList" resultType="NoticeBoardBean">
+select * from notice_freeboard WHERE tb_board_type = 2 and tb_board_dec =0 limit 5
+</select>
+
+</mapper>

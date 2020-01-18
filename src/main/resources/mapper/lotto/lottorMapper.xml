@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="LottoMapper">
+	<!-- 회원가입 -->
+	<select id="InsertLotto" resultType="int" parameterType="LottoListBean">
+		<![CDATA[
+			INSERT INTO
+		lottolist (Episode_Lotto,Total_Num , Num_One ,Num_Two , Num_Three , Num_Four , Num_Five , Num_Six , Num_bonus, Num_One_Price , Num_One_Price_Inwon, Num_OP_price )
+		
+		VALUES(#{Episode_Lotto},#{Total_Num} , #{Num_One},#{Num_Two},#{Num_Three} , #{Num_Four} , #{Num_Five} , #{Num_Six} , #{Num_bonus}, #{Num_One_Price}, #{Num_One_Price_Inwon}, #{Num_OP_price})
+		]]>
+	</select>
+	<!-- 회원 로그인 -->
+	<select id="lottoCount" resultType="int">
+		select ifnull(max(Episode_Lotto),0)as Episode_Lotto from
+		lottolist ORDER BY Lotto_idx DESC LIMIT 1
+	</select>
+
+
+	<select id="lottototalList" resultType="LottoListBean" parameterType="int">
+		select * from lottolist where Episode_Lotto = #{LastEp}
+	</select>
+	
+	<select id="lottototalListLimt1" resultType="LottoListBean" >
+<!-- 	SELECT num_one from LOTTOLIST limit 100 -->
+	SELECT num_one, COUNT(num_one) AS a FROM lottolist  GROUP BY  num_one HAVING  a >=3 ORDER BY a desc  
+<!-- 		SELECT * FROM LOTTOLIST  order by Lotto_idx DESC  -->
+<!-- 		limit 24 -->
+	</select>
+	
+		<select id="lottototalListLimt2" resultType="LottoListBean" >
+	SELECT num_two, COUNT(num_two) AS a FROM lottolist  GROUP BY  num_two HAVING  a >=3 ORDER BY a desc  
+	</select>
+	
+	<select id="lottototalListLimt3" resultType="LottoListBean" >
+	SELECT num_three, COUNT(num_three) AS a FROM lottolist  GROUP BY  num_three HAVING  a >=3 ORDER BY a desc  
+	</select>
+	
+		<select id="lottototalListLimt4" resultType="LottoListBean" >
+	SELECT num_four, COUNT(num_four) AS a FROM lottolist  GROUP BY  num_four HAVING  a >=3 ORDER BY a desc  
+	</select>
+	
+	<select id="lottototalListLimt5" resultType="LottoListBean" >
+	SELECT num_five, COUNT(num_five) AS a FROM lottolist  GROUP BY  num_five HAVING  a >=3 ORDER BY a desc  
+	</select>
+	
+	<select id="lottototalListLimt6" resultType="LottoListBean" >
+	SELECT num_six, COUNT(num_six) AS a FROM lottolist  GROUP BY  num_six HAVING  a >=3 ORDER BY a desc  
+	</select>
+	
+		<select id="lottototalListLimtT" resultType="LottoListBean" >
+	SELECT num_six from LOTTOLIST limit 100
+	</select>
+	
+	<select id="SerchLottoList" resultType="LottoListBean" parameterType="int">
+	SELECT * FROM lottolist where num_one = #{num_one}
+	</select>
+	
+	<select id="OneStNumring" resultType="LottoListBean">
+	SELECT num_one, COUNT(num_one) AS cnt1 FROM lottolist GROUP BY num_one HAVING cnt1 ORDER BY cnt1 desc 
+	</select>
+	
+		<select id="TwoNumring" resultType="LottoListBean">
+	SELECT num_two, COUNT(num_two) AS cnt2 FROM lottolist GROUP BY num_two HAVING cnt2 ORDER BY cnt2 desc 
+	</select>
+	
+	<select id="ThreeNumring" resultType="LottoListBean">
+	SELECT num_three, COUNT(num_three) AS cnt3 FROM lottolist GROUP BY num_three HAVING cnt3 ORDER BY cnt3 desc 
+	</select>
+	
+	<select id="FourNumring" resultType="LottoListBean">
+	SELECT num_four, COUNT(num_four) AS cnt4 FROM lottolist GROUP BY num_four HAVING cnt4 ORDER BY cnt4 desc 
+	</select>
+	
+	<select id="FiveNumring" resultType="LottoListBean">
+	SELECT num_five, COUNT(num_five) AS cnt5 FROM lottolist GROUP BY num_five HAVING cnt5 ORDER BY cnt5 desc 
+	</select>
+	
+	<select id="SixNumring" resultType="LottoListBean">
+	SELECT num_six, COUNT(num_six) AS cnt6 FROM lottolist GROUP BY num_six HAVING cnt6 ORDER BY cnt6 desc 
+	</select>
+	<!-- 회원정보 수정 -->
+<!-- 	<update id="loginupdateday"  parameterType="java.util.HashMap"> -->
+<!-- 		UPDATE tichu_count_member -->
+<!-- 		SET -->
+<!-- 		TB_member_Email = ${TB_member_Email}, -->
+		
+<!-- 		TB_member_Message = ${TB_member_Message}, -->
+		
+<!-- 		TB_member_Update_date = now() -->
+		
+<!-- 				WHERE -->
+<!-- 		TB_member_ID = #{TB_member_ID} -->
+<!-- 	</update> -->
+
+	<!-- 로그인 하면 포인트 업시키기 & 로그인 날짜 업데이트 -->
+<!-- 	<update id="insertPointUp" parameterType="java.util.HashMap"> -->
+<!-- 		UPDATE tichu_count_member -->
+<!-- 		SET -->
+<!-- 		TB_member_Rank_point = -->
+<!-- 		TB_member_Rank_point + 1, -->
+		
+<!-- 		TB_member_DATE = now() -->
+<!-- 		WHERE -->
+<!-- 		TB_member_ID = #{TB_member_ID} -->
+<!-- 	</update> -->
+
+<!-- 	<select id="selectmember" resultType="LottoMemberBean" parameterType="java.util.HashMap"> -->
+
+<!-- 		SELECT TB_member_ID , -->
+<!-- 		TB_member_Name,TB_member_Email , TB_member_DATE , -->
+<!-- 		TB_member_YN , -->
+<!-- 		TB_member_Join_date, -->
+<!-- 		TB_member_Rank_Level, -->
+<!-- 		TB_member_Rank_point -->
+<!-- 		from tichu_count_member -->
+<!-- 		tichuMemberBean -->
+<!-- 		WHERE -->
+<!-- 		tichuMemberBean.TB_member_ID -->
+<!-- 		= #{TB_member_ID} -->
+<!-- 	</select> -->
+
+	<!-- 아이디랑 비밀번호 체크 -->
+<!-- 	<select id="memberpwdchk" resultType="int"> -->
+<!-- 		select count(*) -->
+<!-- 		from -->
+<!-- 		tichu_count_member tichuMemberBean -->
+<!-- 		where tichuMemberBean.TB_member_ID = -->
+<!-- 		#{TB_member_ID} and tichuMemberBean.TB_member_Password = -->
+<!-- 		#{TB_member_Password} -->
+
+<!-- 	</select> -->
+	
+	<!-- 회원정보 수정 -->
+<!-- 	<update id="memberBoardUpdate" parameterType="java.util.HashMap"> -->
+<!-- 		UPDATE tichu_count_member -->
+<!-- 		SET -->
+<!-- 		<if test="TB_member_Message != null"> -->
+<!-- 			TB_member_Message = #{TB_member_Message} -->
+<!-- 		</if> -->
+<!-- 		<if test="TB_member_Message != null and TB_member_Email != null"> , -->
+<!-- 		</if> -->
+<!-- 		<if test="TB_member_Email != null"> -->
+<!-- 			TB_member_Email = #{TB_member_Email} -->
+<!-- 		</if> -->
+<!-- 		,TB_member_Update_date = now() -->
+<!-- 		WHERE TB_member_ID = #{TB_member_ID} -->
+<!-- 	</update> -->
+	<!-- 회원 탈퇴 -->
+<!-- 	<update id="memberRetirement" parameterType="java.util.HashMap"> -->
+
+
+<!-- 		UPDATE tichu_count_member -->
+<!-- 		SET -->
+<!-- 		TB_member_YN = '0' -->
+<!-- 		, -->
+<!-- 		TB_member_Re_date = now() -->
+<!-- 		WHERE -->
+<!-- 		TB_member_ID = #{TB_member_ID} -->
+<!-- 	</update> -->
+	
+<!-- 	<select id="boardIdList" resultType="TichuBoardBean"> -->
+	
+<!-- 	select * from tb_count_board  -->
+<!-- 	WHERE TB_member_Name = #{TB_member_Name} -->
+<!-- 	order by tb_board_bno desc -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="tichuIdList" resultType="TichuBean"> -->
+	
+<!-- 	select * from tichu_count_score WHERE TB_member_Name = #{TB_member_Name} -->
+	
+	
+<!-- 	</select> -->
+	
+<!-- 	<select id="boardIdCount" resultType="int"> -->
+	
+<!-- 	select count(*) from tb_count_board WHERE TB_member_Name = #{TB_member_Name} -->
+<!-- 	</select> -->
+	
+<!-- 		<select id="tichuIdCount" resultType="int"> -->
+	
+<!-- 	select count(*) from tichu_count_score WHERE TB_member_Name = #{TB_member_Name} -->
+<!-- 	</select> -->
+	
+</mapper>

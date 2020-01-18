@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration
+
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+
+<configuration>
+
+	<typeAliases>		
+<!-- <package name="com.taegong.web.bean"/> -->
+<typeAlias  type="com.taegong.web.board.TichuBoardReplyBean" />
+<typeAlias  type="com.taegong.web.home.TichuBean" />
+<typeAlias  type="com.taegong.web.member.TichuMemberBean" />
+<typeAlias  type="com.taegong.web.board.LottoBoardBean" />
+<typeAlias  type="com.taegong.web.home.Criteria" />
+<typeAlias  type="com.taegong.web.home.PageMaker" />
+<typeAlias  type="com.taegong.web.member.LottoMemberBean" />
+<typeAlias  type="com.taegong.web.LottoList.LottoListBean" />
+<typeAlias  type="com.taegong.web.freeboard.FreeBoardBean" />
+<typeAlias  type="com.taegong.web.freeboard.FreeBoardReplyBean" />
+<typeAlias  type="com.taegong.web.noticeboard.NoticeBoardBean" />
+<typeAlias  type="com.taegong.web.noticeboard.NoticeBoardReplyBean" />
+	</typeAliases>
+</configuration>

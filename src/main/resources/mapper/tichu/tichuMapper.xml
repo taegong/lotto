@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="TichuMapper">
+
+
+	<!-- 글쓰기 -->
+	<select id="TichuCountInsert" parameterType="TichuBean">
+		<![CDATA[
+		 INSERT INTO 
+	 tichu_count_score 
+	 (TB_member_Name, TB_member_DATE, TB_Count_A1, TB_Count_A2 , TB_Count_B1, TB_Count_B2, TB_Score_A , TB_Score_B , TB_match , TB_ing_Score_A, TB_ing_Score_B, TB_tichu_hit) 
+	 VALUES
+	 ( #{TB_member_Name}, now(), #{TB_Count_A1}, #{TB_Count_A2} , #{TB_Count_B1} , #{TB_Count_B2}, #{TB_Score_A} , #{TB_Score_B} , #{TB_match} , #{TB_ing_Score_A}, #{TB_ing_Score_B} ,0) 
+		]]>
+	</select>
+	<!-- 티츄 리스트 -->
+	<select id="selectTichuList" resultType="TichuBean">
+		select * from tichu_count_score
+		WHERE TB_index > 0 ORDER by TB_index ASC
+
+		LIMIT #{pageStart}, #{perPageNum}
+	</select>
+	<!-- 총 갯수 -->
+	<select id="findTotalCount" resultType="int">
+		select count(*) from
+		tichu_count_score
+	</select>
+	<!-- 디테일 -->
+	<select id="tichuDetail" parameterType="int"
+		resultType="TichuBean">
+		SELECT
+		*
+		FROM tichu_count_score
+		WHERE
+		TB_index = #{TB_index}
+	</select>
+	
+	<!-- 포인트 업 -->
+	<update id="insertPointUp">
+		UPDATE tichu_count_member
+		SET
+		TB_member_Rank_point =
+		TB_member_Rank_point + 5
+		WHERE
+		TB_member_Name = #{TB_member_Name}
+	</update>
+<!-- 히트수 -->
+	<update id="tichuHit">
+		update tichu_count_score set TB_tichu_hit
+		= TB_tichu_hit + 1
+
+		WHERE TB_index = #{TB_index}
+	</update>
+
+<!-- 댓글 리스트 -->
+	<select id="replytichuList" parameterType="int"
+		resultType="TichuBoardReplyBean">
+		SELECT * FROM count_tichu_reply WHERE tb_board_bno = #{TB_index} ORDER BY
+		parent_id asc , reply_id ASC
+	</select>
+<!-- 댓글 입력 -->
+	<insert id="insertTichuReply" parameterType="java.util.HashMap">
+<!-- 자동증가값을 가져 오기 -->
+		<selectKey resultType="string" keyProperty="parent_id"
+			order="BEFORE">
+			SELECT MAX(reply_id)+1 FROM count_tichu_reply
+		</selectKey>
+
+		insert into count_tichu_reply(
+		tb_board_bno,
+		depth,
+		reply_content,
+		TB_member_Name,
+		parent_id,
+		register_datetime
+		)values(
+		#{TB_index},
+		#{depth},
+		#{reply_content},
+		#{TB_member_Name},
+		#{parent_id},
+		now()
+		)
+
+	</insert>
+	<!-- 대댓글 입력 -->
+	<insert id="insertTichuReReply"
+		parameterType="java.util.HashMap">
+
+
+		insert into count_tichu_reply(
+		tb_board_bno,
+		depth,
+		reply_content,
+		TB_member_Name,
+		parent_id,
+		register_datetime
+		)values(
+		#{TB_index},
+		#{depth},
+		#{reply_content},
+		#{TB_member_Name},
+		#{parent_id},
+		now()
+		)
+
+	</insert>
+<!-- 댓글 삭제 -->
+	<delete id="deleteTichuReply" parameterType="java.util.HashMap">
+
+
+		delete
+		from
+		count_tichu_reply
+		where
+		reply_id = #{reply_id}
+		and TB_member_Name = #{TB_member_Name}
+
+
+	</delete>
+<!-- 대댓글 삭제 -->
+	<delete id="deleteTichuReplyDE"
+		parameterType="java.util.HashMap">
+
+
+		delete
+		from
+		count_tichu_reply
+		where
+		parent_id = #{reply_id}
+
+	</delete>
+
+
+
+</mapper>

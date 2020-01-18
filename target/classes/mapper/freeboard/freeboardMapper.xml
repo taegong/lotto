@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FreeboardMapper">
+
+<!-- 게시글 리스트 -->
+<select id="freeBoardList" resultType="FreeBoardBean">
+		SELECT
+		*
+		FROM
+		lotto_freeboard WHERE tb_board_bno > 0 and tb_board_del_type = 0 ORDER by tb_board_bno DESC
+
+		LIMIT
+		#{pageStart}, #{perPageNum}
+
+	</select>
+   
+   <!-- 게시글 총페이지 -->
+	<select id="findTotalCount" resultType="int">
+		select count(*) from
+		lotto_freeboard
+	</select>
+	
+	<!-- 글쓰기 -->
+	<select id="freeboardInsert" parameterType="FreeBoardBean" resultType="int">
+		INSERT INTO
+		lotto_freeboard (tb_board_subject, TB_member_Name, TB_member_ID, tb_board_content ,tb_board_reg_date)
+		VALUES(#{tb_board_subject},#{TB_member_Name},#{TB_member_ID} ,#{tb_board_content},now())
+	</select>
+	
+	<!-- 게시글 상세 -->
+	<select id="freeboardDetail" parameterType="int"
+		resultType="FreeBoardBean">
+		SELECT
+		*
+		FROM lotto_freeboard
+		WHERE
+		tb_board_bno
+		=#{tb_board_bno}
+	</select>
+	
+		<!-- 히트수 업 -->
+	<update id="BoardHit">
+		update lotto_freeboard set tb_board_hit
+		= tb_board_hit + 1
+
+		WHERE tb_board_bno = #{tb_board_bno}
+
+	</update>
+	
+	<!-- 게시글 수정 -->
+	<update id="freeBoardUpdate" parameterType="java.util.HashMap">
+		UPDATE lotto_freeboard
+		SET
+		<if test="tb_board_subject != null">
+			tb_board_subject = #{tb_board_subject}
+		</if>
+		<if test="tb_board_subject != null and tb_board_content != null"> ,
+		</if>
+		<if test="tb_board_content != null">
+			tb_board_content = #{tb_board_content}
+		</if>
+		WHERE tb_board_bno = #{tb_board_bno}
+	</update>
+	
+	
+	<!-- 게시글 삭제 -->
+	<update id="freeBoardDelete"  parameterType="java.util.HashMap">
+		update 
+		lotto_freeboard set tb_board_dec = 1 , tb_board_del_type = 1 , tb_board_del_date = now() WHERE tb_board_bno =#{tb_board_bno}
+	</update>
+	
+<select id="FreeboardUpCount" parameterType="FreeBoardBean" resultType="int">
+select count(tb_board_up)as tb_board_up from board_up_down WHERE tb_board_up =1 and tb_board_bno = ${tb_board_bno} and tb_board_type = 3
+</select>
+
+<select id="FreeboardDownCount" parameterType="FreeBoardBean" resultType="int">
+select count(tb_board_down)as tb_board_down from board_up_down WHERE tb_board_down =1 and tb_board_bno = ${tb_board_bno} and tb_board_type = 3
+</select>	
+
+<select id="FreeboardUPChk" parameterType="java.util.HashMap" resultType="int">   
+select count(*) from board_up_down WHERE tb_board_bno =${tb_board_bno} and TB_member_ID = ${TB_member_ID} and tb_board_type = 3
+</select> 
+
+<!-- 댓글 쓰기 -->
+	<insert id="FreeinsertBoardReply" parameterType="java.util.HashMap">
+	<!-- 자동증가값을 가져 오기 위한 구문 -->
+		<selectKey resultType="string" keyProperty="parent_id"
+			order="BEFORE">
+			SELECT MAX(reply_id)+1 FROM free_board_reply
+		</selectKey>
+
+		insert into free_board_reply(
+		tb_board_bno,
+		depth,
+		reply_content,
+		TB_member_Name,
+		parent_id,
+		register_datetime
+		)values(
+		#{tb_board_bno},
+		#{depth},
+		#{reply_content},
+		#{TB_member_Name},
+		#{parent_id},
+		now()
+		)
+
+	</insert>
+	
+	<!-- 댓글 리스트 -->
+	<select id="FreereplyBoardList" parameterType="int"
+		resultType="FreeBoardReplyBean">
+		SELECT * FROM free_board_reply WHERE tb_board_bno = #{tb_board_bno} and reply_del = 0 ORDER
+		BY parent_id asc , reply_id ASC
+	</select>
+	
+	<!-- 대댓글 쓰기 -->
+	<insert id="FreeinsertBoardReReply"
+		parameterType="java.util.HashMap">
+
+
+		insert into free_board_reply(
+		tb_board_bno,
+		depth,
+		reply_content,
+		TB_member_Name,
+		parent_id,
+		register_datetime
+		)values(
+		#{tb_board_bno},
+		#{depth},
+		#{reply_content},
+		#{TB_member_Name},
+		#{parent_id},
+		now()
+		)
+
+	</insert>
+	
+	<!-- 댓글 삭제 -->
+
+	<update id="freedeleteBoardReply" parameterType="java.util.HashMap">
+
+
+		
+		update free_board_reply
+		set
+		reply_del = 1
+		, 
+		del_datetime = now()
+		where
+		reply_id = #{reply_id}
+		and TB_member_Name = #{TB_member_Name}
+		
+
+
+	</update>
+	
+	<select id="freereplyUpdate" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	select * from free_board_reply where reply_id = #{reply_id}
+	
+	</select>
+	
+		<update id="freereplyUpdatesPut" parameterType="java.util.HashMap">
+			UPDATE free_board_reply
+		SET
+		<if test="reply_content != null">
+			reply_content = #{reply_content}
+		</if>
+		WHERE reply_id = #{reply_id}
+	
+	</update>
+	
+</mapper>

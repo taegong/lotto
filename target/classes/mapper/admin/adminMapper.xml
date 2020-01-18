@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="AdminMapper">
+	<!-- 총회원수 -->
+	<select id="totalMember" resultType="int">
+		select count(*) from tichu_count_member
+	</select>
+
+	<!--NOW() 함수이용 오늘 가입한 회원 수 구하기 -->
+	<select id="TodayJoinmember" resultType="int">
+		SELECT count(*) FROM tichu_count_member
+
+		WHERE DATE(TB_member_Join_date) = DATE(NOW())
+
+	</select>
+	
+	<!-- NOW() 함수 이용 오늘 가입한 회원 리스트 -->
+	<select id="TodayJoinMemberList" resultType="TichuMemberBean">
+		SELECT * FROM tichu_count_member
+
+		WHERE DATE(TB_member_Join_date) = DATE(NOW())
+
+
+	</select>
+	
+	<!-- NOW() 함수 이용 오늘 탈퇴한 회원수 -->
+	<select id="todayRemember" resultType="int">
+		SELECT count(*) FROM tichu_count_member
+
+		WHERE DATE(TB_member_Re_date) = DATE(NOW())
+
+
+		ANd TB_member_YN = '0'
+	</select>
+
+	<!-- NOW() 함수 이용 오늘 회원 탈퇴 리스트 -->
+	<select id="TodayReList" resultType="TichuMemberBean">
+		SELECT * FROM tichu_count_member
+
+		WHERE DATE(TB_member_Re_date) = DATE(NOW())
+
+
+		AND TB_member_YN = '0'
+
+	</select>
+	<!-- 회원 랭크 리스트 -->
+	<select id="MemberRank" resultType="TichuMemberBean">
+		select TB_member_ID , TB_member_Name , TB_member_DATE , TB_member_Join_date
+		, TB_member_Rank_Level , TB_member_Rank_point ,TB_member_YN from
+		tichu_count_member
+		WHERE TB_member_YN = 1
+		ORDER by TB_member_Rank_point DESC
+	</select>
+	<!-- 어드민 체크 -->
+	<select id="AdminChk" resultType="int">
+		select TB_member_YN from tichu_count_member WHERE TB_member_ID =
+		#{TB_member_ID}
+
+	</select>
+	
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="MemberMapper">
+	<!-- 회원 가입 아이디 체크 -->
+	<select id="memberidchk" resultType="int" parameterType="java.util.HashMap">
+		select count(*) from
+		tichu_count_member tichuMemberBean
+		where tichuMemberBean.TB_member_ID =
+		#{TB_member_ID}
+	</select>
+	<!-- 회원가입 -->
+	<select id="insertMember" resultType="int" parameterType="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO
+		tichu_count_member (TB_member_ID, TB_member_Name ,
+		TB_member_Password ,TB_member_Email , TB_member_DATE ,
+		TB_member_YN
+		,TB_member_Join_date , TB_member_Message, TB_member_Rank_Level ,TB_member_Rank_point )
+		VALUES(#{TB_member_ID},#{TB_member_Name} , #{TB_member_Password},#{TB_member_Email},now()
+		, 1 , now(), #{TB_member_Message}, 1 , 0)
+		]]>
+	</select>
+	<!-- 회원 로그인 -->
+	<select id="memberLogin" resultType="int" parameterType="java.util.HashMap">
+		select count(*) from
+		tichu_count_member tichuMemberBean
+		where TB_member_ID = #{TB_member_ID} 
+		and 
+		TB_member_Password = #{TB_member_Password} 
+		and TB_member_YN > 0
+	</select>
+
+	<!-- 회원정보 수정 -->
+	<update id="loginupdateday"  parameterType="java.util.HashMap">
+		UPDATE tichu_count_member
+		SET
+		TB_member_Email = ${TB_member_Email},
+		
+		TB_member_Message = ${TB_member_Message},
+		
+		TB_member_Update_date = now()
+		
+				WHERE
+		TB_member_ID = #{TB_member_ID}
+	</update>
+
+	<!-- 로그인 하면 포인트 업시키기 & 로그인 날짜 업데이트 -->
+	<update id="insertPointUp" parameterType="java.util.HashMap">
+		UPDATE tichu_count_member
+		SET
+		TB_member_Rank_point =
+		TB_member_Rank_point + 1,
+		
+		TB_member_DATE = now()
+		WHERE
+		TB_member_ID = #{TB_member_ID}
+	</update>
+
+	<select id="selectmember" resultType="LottoMemberBean" parameterType="java.util.HashMap">
+
+		SELECT TB_member_ID ,
+		TB_member_Name,TB_member_Email , TB_member_DATE ,
+		TB_member_YN ,
+		TB_member_Join_date,
+		TB_member_Rank_Level,
+		TB_member_Rank_point
+		from tichu_count_member
+		
+		WHERE
+		TB_member_ID
+		= #{TB_member_ID}
+	</select>
+
+	<!-- 아이디랑 비밀번호 체크 -->
+	<select id="memberpwdchk" resultType="int">
+		select count(*)
+		from
+		tichu_count_member tichuMemberBean
+		where tichuMemberBean.TB_member_ID =
+		#{TB_member_ID} and tichuMemberBean.TB_member_Password =
+		#{TB_member_Password}
+
+	</select>
+	
+	<!-- 회원정보 수정 -->
+	<update id="memberBoardUpdate" parameterType="java.util.HashMap">
+		UPDATE tichu_count_member
+		SET
+		<if test="TB_member_Message != null">
+			TB_member_Message = #{TB_member_Message}
+		</if>
+		<if test="TB_member_Message != null and TB_member_Email != null"> ,
+		</if>
+		<if test="TB_member_Email != null">
+			TB_member_Email = #{TB_member_Email}
+		</if>
+		,TB_member_Update_date = now()
+		WHERE TB_member_ID = #{TB_member_ID}
+	</update>
+	<!-- 회원 탈퇴 -->
+	<update id="memberRetirement" parameterType="java.util.HashMap">
+
+
+		UPDATE tichu_count_member
+		SET
+		TB_member_YN = '0'
+		,
+		TB_member_Re_date = now()
+		WHERE
+		TB_member_ID = #{TB_member_ID}
+	</update>
+	
+	<select id="boardIdList" resultType="LottoBoardBean">
+	
+	select * from tb_count_board 
+	WHERE TB_member_Name = #{TB_member_Name}
+	order by tb_board_bno desc
+	</select>
+	
+	<select id="tichuIdList" resultType="TichuBean">
+	
+	select * from tichu_count_score WHERE TB_member_Name = #{TB_member_Name}
+	
+	
+	</select>
+	
+	<select id="boardIdCount" resultType="int">
+	
+	select count(*) from tb_count_board WHERE TB_member_Name = #{TB_member_Name}
+	</select>
+	
+		<select id="tichuIdCount" resultType="int">
+	
+	select count(*) from tichu_count_score WHERE TB_member_Name = #{TB_member_Name}
+	</select>
+	
+</mapper>
